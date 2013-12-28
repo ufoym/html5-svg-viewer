@@ -27,7 +27,7 @@
     <script type="text/javascript">
 
         var is_first = true;
-        var curr_index = 0;
+        var curr_index = -1;
         var viewed_svgs = [];
         var viewed_names = [];
         var $dropArea = $('#dropArea');
@@ -81,6 +81,7 @@
                     if (doc != null && doc != '') {
                         viewed_svgs.push(doc);
                         viewed_names.push(theFile.name);
+                        curr_index++;
                         var lock_zoom = (is_first
                             || !$("#lock-zoom").prop("checked"));
                         draw_svg(doc, theFile.name, lock_zoom);
@@ -92,21 +93,34 @@
             return false;
         };
 
-        $(document).keypress(function() {
-            if ( event.which == 100 ) {
-                if (curr_index < viewed_names.length - 1) {
-                    curr_index++;;
-                }
-            }
-            else if ( event.which == 97 ) {
+        $(document).keydown(function (e) {
+            var need_redraw = false;
+            switch (e.which) {
+                case 37: // left
                 if (curr_index > 0) {
                     curr_index--;
+                    need_redraw = true;
                 }
+                break;
+
+                case 39: // right
+                if (curr_index < viewed_names.length - 1) {
+                    curr_index++;
+                    need_redraw = true;
+                }
+                break;
+
+                default:
+                break;
             }
-            var curr_svg = viewed_svgs[curr_index];
-            var curr_name = viewed_names[curr_index];
-            var lock_zoom = !$("#lock-zoom").prop("checked");
-            draw_svg(curr_svg, curr_name, lock_zoom);
+            if (need_redraw) {
+                e.preventDefault();
+                var curr_svg = viewed_svgs[curr_index];
+                var curr_name = viewed_names[curr_index];
+                var lock_zoom = !$("#lock-zoom").prop("checked");
+                draw_svg(curr_svg, curr_name, lock_zoom);
+            }
+            return !need_redraw;
         });
 
         applyLayout = function() {
