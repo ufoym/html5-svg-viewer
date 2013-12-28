@@ -11,9 +11,13 @@ http://ufoym.com/html5-svg-viewer/
 
 current features
 ----------------
-* load external svg
-* zoom in / out svg
-* pan svg
-* lock transformation
+* loading external svg
+  * drag and drop
+  * multiple files
+  * natural order sorting of file names
+* transformation
+  * zoom
+  * pan
+  * transformation lock
 * responsive layout
 * history view
