@@ -160,6 +160,20 @@
                 }
                 break;
 
+                case 38: // up
+                if (viewed_names.length > 0) {
+                    curr_index = 0;
+                    need_redraw = true;
+                }
+                break;
+
+                case 40: // down
+                if (viewed_names.length > 0) {
+                    curr_index = viewed_names.length - 1;
+                    need_redraw = true;
+                }
+                break;
+
                 default:
                 break;
             }
