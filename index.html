@@ -13,7 +13,7 @@
             font-size: 150%; font-weight: bold; }
         #dropArea { border: 5px dashed #ccc; text-align: center; z-index: -1;
             position: absolute; color: #ccc; font-family: Arial;
-            font-size: 300%; font-weight: bold; }
+            font-size: 300%; font-weight: bold; overflow: hidden; }
         #dropArea.hover { border: 5px dashed #333; color: #333; }
     </style>
 </head>
@@ -26,10 +26,53 @@
     <div id="dropArea">Drop file here</div>
     <script type="text/javascript">
 
+        // status
+
         var curr_index = -1;
         var viewed_svgs = [];
         var viewed_names = [];
         var $dropArea = $('#dropArea');
+
+        // file name sorting
+
+        function compare_filename (file_a, file_b) {
+            function alphanum (a, b) {
+                function chunkify (t) {
+                    var tz = new Array();
+                    var x = 0,
+                        y = -1,
+                        n = 0,
+                        i, j;
+
+                    while (i = (j = t.charAt(x++)).charCodeAt(0)) {
+                        var m = (i == 46 || (i >= 48 && i <= 57));
+                        if (m !== n) {
+                            tz[++y] = "";
+                            n = m;
+                        }
+                        tz[y] += j;
+                    }
+                    return tz;
+                }
+
+                var aa = chunkify(a);
+                var bb = chunkify(b);
+
+                for (x = 0; aa[x] && bb[x]; x++) {
+                    if (aa[x] !== bb[x]) {
+                        var c = Number(aa[x]),
+                            d = Number(bb[x]);
+                        if (c == aa[x] && d == bb[x]) {
+                            return c - d;
+                        } else return (aa[x] > bb[x]) ? 1 : -1;
+                    }
+                }
+                return aa.length - bb.length;
+            }
+            return alphanum(file_a.name, file_b.name);
+        }
+
+        // rendering
 
         draw_svg = function (doc, name, lock_zoom) {
             var matrix_s = ''
@@ -60,6 +103,8 @@
             $('svg').svgPan('viewport', true, true, false, .5);
         };
 
+        // control
+
         dropArea.ondragover = function () {
             this.className = 'hover';
             return false;
@@ -73,7 +118,8 @@
             e.preventDefault();
 
             var is_first = curr_index < 0;
-            var files = e.dataTransfer.files;
+            var files = [].slice.call(e.dataTransfer.files);
+            files.sort(compare_filename);
             for (var i = 0, file; file = files[i]; i++) {
                 if (!file.type.match('image/svg.*')) {
                     continue;
@@ -127,6 +173,8 @@
             return !need_redraw;
         });
 
+        // layout
+
         applyLayout = function() {
             $('#dropArea').width($(window).width() - 50);
             $('#dropArea').height($(window).height() - 50);
@@ -140,6 +188,8 @@
         $(document).ready(function() {
             applyLayout();
         });
+
+
     </script>
 </body>
 </html>
