@@ -26,7 +26,6 @@
     <div id="dropArea">Drop file here</div>
     <script type="text/javascript">
 
-        var is_first = true;
         var curr_index = -1;
         var viewed_svgs = [];
         var viewed_names = [];
@@ -73,23 +72,28 @@
             this.className = '';
             e.preventDefault();
 
-            var file = e.dataTransfer.files[0],
-            reader = new FileReader();
-            reader.onload = (function(theFile) {
-                return function(e) {
-                    doc = e.target.result;
-                    if (doc != null && doc != '') {
-                        viewed_svgs.push(doc);
-                        viewed_names.push(theFile.name);
-                        curr_index++;
-                        var lock_zoom = (!is_first
-                            && $("#lock-zoom").prop("checked"));
-                        draw_svg(doc, theFile.name, lock_zoom);
-                        is_first = false;
-                    }
-                };
-            })(file);
-            reader.readAsText(file);
+            var is_first = curr_index < 0;
+            var files = e.dataTransfer.files;
+            for (var i = 0, file; file = files[i]; i++) {
+                if (!file.type.match('image/svg.*')) {
+                    continue;
+                }
+                var reader = new FileReader();
+                reader.onload = (function(theFile) {
+                    return function(e) {
+                        doc = e.target.result;
+                        if (doc != null && doc != '') {
+                            var lock_zoom = (!is_first
+                                && $("#lock-zoom").prop("checked"));
+                            draw_svg(doc, theFile.name, lock_zoom);
+                            viewed_svgs.push(doc);
+                            viewed_names.push(theFile.name);
+                            curr_index++;
+                        }
+                    };
+                })(file);
+                reader.readAsText(file);
+            }
             return false;
         };
 
