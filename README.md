@@ -13,7 +13,7 @@ current features
 ----------------
 * loading external svg
   * drag and drop
-  * multiple files
+  * support multiple files
   * natural order sorting of file names
 * transformation
   * zoom
