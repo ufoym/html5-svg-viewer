@@ -35,6 +35,9 @@
         draw_svg = function (doc, name, lock_zoom) {
             var matrix_s = ''
             if (lock_zoom) {
+                matrix_s = $('#viewport').attr("transform");
+            }
+            else {
                 $('#dropArea').html(doc);
                 var doc_width = $(dropArea).width();
                 var doc_height = $(dropArea).height();
@@ -46,9 +49,6 @@
                 var left = (doc_width - svg_width * scale) * .5;
                 matrix_s = 'translate('+left+','+top+')'
                          + ' scale('+scale+','+scale+')';
-            }
-            else {
-                matrix_s = $('#viewport').attr("transform");
             }
             $('#info').html(name);
             $('#info').css({"background-color": "#ddd"});
@@ -82,8 +82,8 @@
                         viewed_svgs.push(doc);
                         viewed_names.push(theFile.name);
                         curr_index++;
-                        var lock_zoom = (is_first
-                            || !$("#lock-zoom").prop("checked"));
+                        var lock_zoom = (!is_first
+                            && $("#lock-zoom").prop("checked"));
                         draw_svg(doc, theFile.name, lock_zoom);
                         is_first = false;
                     }
@@ -117,7 +117,7 @@
                 e.preventDefault();
                 var curr_svg = viewed_svgs[curr_index];
                 var curr_name = viewed_names[curr_index];
-                var lock_zoom = !$("#lock-zoom").prop("checked");
+                var lock_zoom = $("#lock-zoom").prop("checked");
                 draw_svg(curr_svg, curr_name, lock_zoom);
             }
             return !need_redraw;
